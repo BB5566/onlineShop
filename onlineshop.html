@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Shop</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+      integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Digital+7&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* 1. 基礎布局 */
+      body {
+        background-color: #f0f0f0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 900px;
+        margin: 20px auto;
+        padding: 30px;
+        background: linear-gradient(145deg, #e6e6e6, #ffffff);
+        border: 15px solid #333;
+        border-radius: 20px;
+        box-shadow: 0 0 0 5px #666, 0 10px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      /* 2. LED顯示相關 */
+      .top-money {
+        display: flex;
+        justify-content: space-between;
+        background: #000;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 3px solid #444;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .top-money div {
+        font-family: "Digital-7", monospace;
+        color: #00ff00;
+        font-size: 24px;
+        text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+      }
+
+      /* 3. 商品相關 */
+      .box-container {
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 20px;
+        max-width: 900px;
+      }
+
+      .product-box {
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        border: 8px solid #333;
+        border-radius: 20px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1),
+          5px 5px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .product-box:hover {
+        transform: translateY(-5px);
+      }
+
+      .product-box.selected {
+        border-color: #00ff00;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1),
+          0 0 20px rgba(0, 255, 0, 0.3);
+      }
+
+      .product-emoji {
+        font-size: 60px;
+        text-align: center;
+      }
+
+      .product-name {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 10px 0;
+        color: #333;
+      }
+
+      .product-price {
+        text-align: center;
+        font-family: "Digital-7", monospace;
+        font-size: 24px;
+        color: #00ff00;
+        text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+        background: #000;
+        padding: 5px;
+        border-radius: 5px;
+        margin: 5px 0;
+      }
+
+      .quantity-controls {
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .quantity-btn {
+        padding: 5px 10px;
+        border: none;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0 3px;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .quantity-btn.decrease {
+        background: linear-gradient(145deg, #ff5555, #ff0000);
+      }
+
+      .quantity-btn.increase {
+        background: linear-gradient(145deg, #44ff44, #00ff00);
+      }
+
+      .quantity-number {
+        margin: 0 10px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      /* 4. 購物車相關 */
+      .cart-container {
+        margin: 20px auto;
+        background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        padding: 20px;
+        border: 5px solid #333;
+        border-radius: 15px;
+        max-width: 90%;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .cart-container h3 {
+        color: #333;
+        margin: 0 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+      }
+
+      .cart-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .cart-item {
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        padding: 12px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 2px solid #ddd;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+      }
+
+      /* 購物車項目樣式 */
+      .cart-item-emoji {
+        font-size: 24px;
+      }
+
+      .cart-item-name {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .cart-item-quantity {
+        color: #666;
+      }
+
+      .cart-item-price {
+        font-family: "Digital-7", monospace;
+        color: #00aa00;
+        background: #111;
+        padding: 3px 8px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">      <div class="top-money">
+        <div>商品金額</div>
+        <div>合計金額</div>
+        <div>結帳金額</div>
+      </div>
+      <div class="box-container"></div>
+      <div class="cart-container">
+        <h3>購物車</h3>
+        <div class="cart-items"></div>
+      </div>
+    </div>
+
+    <script>
+      // 商品資料
+      const products = [
+        {
+          name: "可樂",
+          price: 30,
+          img: "🥤",
+          quantity: 0,
+        },
+        {
+          name: "薯條",
+          price: 50,
+          img: "🍟",
+          quantity: 0,
+        },
+        {
+          name: "巧克力",
+          price: 40,
+          img: "🍫",
+          quantity: 0,
+        },
+        {
+          name: "泡麵",
+          price: 60,
+          img: "🍜",
+          quantity: 0,
+        },
+        {
+          name: "冰淇淋",
+          price: 45,
+          img: "🍦",
+          quantity: 0,
+        },
+      ];
+
+      $(document).ready(function () {
+        let currentIndex = 0;
+
+        // 計算總金額函數
+        function calculateTotal() {
+          let sum = 0;
+          products.forEach((product) => {
+            sum += product.price * product.quantity;
+          });
+          return sum;
+        }        // 更新顯示金額
+        function updatePrices() {
+          const total = calculateTotal();
+          const currentProduct = products[currentIndex];
+          const isDiscount = total >= 500;
+          const finalPrice = isDiscount ? total * 0.8 : total;
+
+          // 更新顯示
+          $(".top-money").html(`
+                <div>商品單價：$${currentProduct.price}</div>
+                <div>合計金額：$${total}${isDiscount ? " (達到滿500打8折)" : ""}</div>
+                <div>結帳金額：$${finalPrice}</div>
+            `);
+        }        // 更新購物車顯示
+        function updateCart() {
+          const $cartItems = $(".cart-items");
+          $cartItems.empty();
+
+          products.forEach((product) => {
+            if (product.quantity > 0) {
+              const subtotal = product.price * product.quantity;
+              const $cartItem = $("<div>").addClass("cart-item").html(`
+                        <span class="cart-item-emoji">${product.img}</span>
+                        <span class="cart-item-name">${product.name}</span>
+                        <span class="cart-item-quantity">×${product.quantity}</span>
+                        <span class="cart-item-price">$${subtotal}</span>
+                    `);
+              $cartItems.append($cartItem);
+            }
+          });
+        }
+
+        // 渲染商品列表
+        function render() {
+          const boxContainer = $(".box-container");
+          boxContainer.empty();
+
+          products.forEach((product, index) => {
+            const productBox = $("<div>")
+              .addClass("product-box")
+              .addClass(index === currentIndex ? "selected" : "").html(`
+                        <div class="product-emoji">${product.img}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">$${product.price}</div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn decrease">-</button>
+                            <span class="quantity-number">×${product.quantity}</span>
+                            <button class="quantity-btn increase">+</button>
+                        </div>
+                    `);
+
+            // 商品選擇事件
+            productBox.on("click", function (e) {
+              if (!$(e.target).hasClass("quantity-btn")) {
+                selectProduct(index);
+              }
+            });
+
+            // 增減按鈕事件
+            productBox.find(".decrease").on("click", function () {
+              decreaseQuantity(index);
+            });
+
+            productBox.find(".increase").on("click", function () {
+              increaseQuantity(index);
+            });
+
+            boxContainer.append(productBox);
+          });
+
+          updatePrices();
+          updateCart();
+        }
+
+        // 選擇商品
+        function selectProduct(index) {
+          currentIndex = index;
+          render();
+        }
+
+        // 增加數量
+        function increaseQuantity(index) {
+          const product = products[index];
+          product.quantity++;
+          render();
+        }
+
+        // 減少數量
+        function decreaseQuantity(index) {
+          const product = products[index];
+          if (product.quantity > 0) {
+            product.quantity--;
+            render();
+          }
+        }
+
+        // 初始化
+        render();
+      });
+    </script>
+  </body>
+</html>
